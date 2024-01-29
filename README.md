@@ -15,16 +15,17 @@
 更多內容請見[編譯結果](./build/main.pdf)與內文。
 
 ---
-<div class="Success" style='padding:0.1em; background-color:#D8EED0; color:#30652E'>
-<span>
-<p style='margin-top:1em; text-align:center'>
-<b>Note</b></p>
-<p style='margin-left:6em;'>
-如果您發現這個板型有問題，請提交 Issues，也非常歡迎您提交 PR 協助修正問題。<BR>
-若有期望加入其他功能改善論文撰寫環境，也歡迎提交 Issus 許願！ <BR>
-歡迎各位先進、學長姊、學弟妹 Fork 本 Repo
-</p>
-</span>
+<div class="Success" style="padding:0.1em; background-color:#D8EED0; color:#30652E; border-radius:10px;">
+  <span>
+    <p style="margin-top:1em; text-align:center; font-size:1.5em;">
+      <b>Note</b>
+    </p>
+    <p style="margin-left:6em;">
+      如果您發現這個板型有問題，請提交 Issues，也非常歡迎您提交 PR 協助修正問題。<br>
+      若有期望加入其他功能改善論文撰寫環境，也歡迎提交 Issues 許願！ <br>
+      歡迎各位先進、學長姊、學弟妹 Fork 本 Repo
+    </p>
+  </span>
 </div>
 
 ---
@@ -114,62 +115,30 @@ $ sudo apt install make
 ### [Texlive](https://tug.org/texlive/)
 >   選擇 Docker 方案的使用者，不須安裝此工具。
 
+**約 5.6 GB**</br>
 LeTeX 文件編譯工具。
-以下從台灣國立海洋科大鏡像站下載 texlive 最新檔案，及安裝方式
+以下從 Magic Transit 鏡像站下載 texlive 最新檔案，及安裝方式
 ```
 ### debian / ubuntu
-$ wget https://ftp.ntou.edu.tw/ctan/systems/texlive/Images/texlive.iso .
+$ wget https://tw.mirrors.cicku.me/ctan/systems/texlive/Images/texlive.iso .
 $ mkdir ~/texlive_ISO
 $ cd ~/texlive_ISO
 $ sudo sh ./install.sh
+
+### windows
+掛載 iso 檔後進行安裝。
 ```
 
-### Containers
+
+### [Containers](./docker/Readme.md)
 Docker 與 Podman 同為管理容器 (container) 的軟體，皆可以使用 [Make](#make) 命令編譯此專案。
 
-#### [Docker](https://www.docker.com/)
+**約 4.71 GB**</br>
 >   如已有 xelatex 編譯環境的使用者，不須安裝此工具。
 >   Docker 與 Podman 擇一即可
 
-適用於不想建立環境的用戶，安裝說明詳見[官方文件](https://docs.docker.com/engine/install/)。
-使用的 image [texlive/texlive](https://hub.docker.com/r/texlive/texlive/)
-
-```
-### debian / ubuntu
-$ docker pull texlive/texlive
-$ git clone https://github.com/tw1chao/STUST-thesis-template.git
-$ cd STUST-thesis-template/Containers/Docker/linux/
-$ sh build.sh
-$ sh start.sh
-$ sh attach.sh
-```
-
-#### [Podman](https://podman.io/)
->   如已有 xelatex 編譯環境的使用者，不須安裝此工具。
->   Podman 與 Docker 擇一即可
-
-也適用於不想建立環境的用戶，安裝說明詳見[官方文件](https://podman.io/getting-started/installation.html)
-與 Docker 使用相同 image [texlive/texlive](https://hub.docker.com/r/texlive/texlive/)，並且有 [Podman-Desktop](https://podman-desktop.io/) 的圖形介面支援。
-
-```
-### debian / ubuntu
-$ podman pull docker.io/texlive/texlive
-$ git clone https://github.com/tw1chao/STUST-thesis-template.git
-$ cd STUST-thesis-template/Containers/podman/linux/
-$ sh build.sh
-$ sh start.sh
-$ sh attach.sh
-```
-
-```
-### windows
- podman pull docker.io/texlive/texlive
- git clone https://github.com/tw1chao/STUST-thesis-template.git
- cd STUST-thesis-template/Containers/podman/win/
- build.bat
- start.bat
- attach.bat
-```
+使用的 image 為 [alpine](https://hub.docker.com/_/alpine/)，image
+參考 docker/Readme.md 
 
 
 ### [Git](http://git-scm.com/)

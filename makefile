@@ -1,4 +1,4 @@
-# Title: Makefile
+# file:  ./makefile
 # Date:  2021/10/15
 # Name:  YingChao
 
@@ -98,7 +98,7 @@ compress:
   	-dCompressFonts=true \
 	-sOutputFile=${BUILD_DIR}/$(MAINDOC)_out.pdf \
 	${BUILD_DIR}/$(MAINDOC).pdf
-	@echo "\033[32m [MSG] 		PDF Size is compressed\033[0m"	
+	@echo -e "\033[32m [MSG] 		PDF Size is compressed\033[0m"	
 	@cd $(BUILD_DIR);\
 	rm -f *.xdv;\
 	rm -f $(MAINDOC).pdf;\

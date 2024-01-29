@@ -12,9 +12,9 @@
 %----------------------------------------------------------------------
 
 \NeedsTeXFormat{LaTeX2e}[2018-12-01]
-\ProvidesClass{../Configurations/STUST-MS-Thesis}[2020/02/03 v1.0 LaTeX document class]
+\ProvidesClass{../config/STUST-MS-Thesis}[2020/02/03 v1.0 LaTeX document class]
 \providecommand{\baseclass}{book}
-\input{../Configurations/Config}
+\input{../config/Config}
 
 \RequirePackage{etoolbox}
 \RequirePackage{xparse}

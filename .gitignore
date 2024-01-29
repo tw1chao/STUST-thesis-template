@@ -25,3 +25,8 @@
 *.toc
 *.xwm
 *.xdv
+
+
+# MacOS Envirable
+
+.DS_Store
