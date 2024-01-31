@@ -1,3 +1,4 @@
+# build file
 *.acn
 *.alg
 *.acr
@@ -19,14 +20,17 @@
 *.log
 *.run.xml
 *.synctex.gz
-*.synctex.gz(buzy)
+*.synctex.gz(busy)
 *.fdb_latexmk
 *.log
 *.toc
 *.xwm
 *.xdv
-
+CMakeCache.txt
+build/Makefile
+build/CMakeFiles/
+build/main/
+build/*.cmake
 
 # MacOS Envirable
-
 .DS_Store

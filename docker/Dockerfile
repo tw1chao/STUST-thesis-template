@@ -1,16 +1,13 @@
-# # syntax=docker/dockerfile:1.3-labs
-
-FROM alpine:latest AS base
+FROM alpine:latest 
 
 LABEL maintainer="yingchao <yingchao.tw@google.com>"
 
-# clean apt buffer and rebuild.
+# Install dependencies that rarely change
 RUN apk update && apk add --no-cache \
-    texlive-full biber icu-data-full make cmake shadow
-    # bash-completion bash \ 
-    # sudo musl
+    texlive-full biber icu-data-full ghostscript make cmake shadow \
+    sudo musl
 
-# user configuration - rootless setup
+# ARGs to configure user
 ARG USER
 ARG USERID
 ARG GROUPID
@@ -18,7 +15,7 @@ ARG PROJECT
 ARG PROJECTDIR=/home/$USER
 
 # Update UID login.defs accordingly
-RUN echo -e "UID_MIN 500\nUID_MAX 60000" > /etc/login.defs;
+RUN echo -e "UID_MIN 500\nUID_MAX 60000" > /etc/login.defs
 
 # Create user and group if they do not exist
 RUN set -x \
@@ -33,14 +30,11 @@ RUN set -x \
 RUN echo "%wheel ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 RUN addgroup $USER wheel
 
-# COPY --from=latex /usr/share/texmf/         /usr/share/texmf/
-# COPY --from=latex /usr/local/texlive/       /usr/local/texlive/
-
-
-# work directory
+# Set work directory
 WORKDIR $PROJECTDIR/$PROJECT
 
-# login
+# Set user for the container
 USER $USER
 
+# Final command
 CMD ["bash", "-l"]

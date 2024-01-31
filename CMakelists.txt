@@ -1,0 +1,60 @@
+# CMakeLists.txt
+# Date: 2024/1/19
+# Name: YingChao
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.11)
+PROJECT(LatexProject    NONE)
+
+SET(LATEX_OUTPUT_PATH   build)
+
+# The directory where the final build data will be stored.
+SET(OUT_DIRECTORY       "${CMAKE_SOURCE_DIR}/${LATEX_OUTPUT_PATH}")
+
+# Latex source file.
+SET( MAIN_TEX_BASE_FILENAME "main")
+SET( MAIN_TEX "${CMAKE_SOURCE_DIR}/main/${MAIN_TEX_BASE_FILENAME}.tex")
+SET( MAIN_XDV "${OUT_DIRECTORY}/${MAIN_TEX_BASE_FILENAME}.xdv")
+SET( MAIN_AUX "${OUT_DIRECTORY}/${MAIN_TEX_BASE_FILENAME}.aux")
+SET( MAIN_PDF "${OUT_DIRECTORY}/${MAIN_TEX_BASE_FILENAME}.pdf")
+
+# commands parameter
+
+set(LATEX_COMPILER_FLAGS "-jobname=${USERNAME}"
+    CACHE STRING "Flags passed to latex.")
+SET(FILESYNC            -synctex=1)
+SET(FILE_ERR            -file-line-error)
+SET(INTERACT            -interaction=nonstopmode)  #batchmode
+SET(HALT_ERR            -halt-on-error)
+SET(NONE_PDF            -no-pdf)
+SET(MAXLINE             -max-print-line=2048 )
+SET(OUTP_DIR            -output-directory=${OUT_DIRECTORY})
+SET(OUTP_DRV            -output-driver='dvipdfm -z0') # 此參數設定 PDF 壓縮等級
+
+SET(TEX_OPTS            ${FILESYNC} ${FILE_ERR} ${INTERACT} ${HALT_ERR} ${NONE_PDF} ${OUTP_DIR} ${OUTP_DRV})
+
+SET(GS_EXECUTABLE       gs)
+SET(GHOSTSCRIPT_LFLAGS  -sDEVICE=pdfwrite -dCompatibilityLevel=1.5 -dPDFSETTINGS=/printer -dQUIET -dBATCH -dNOPAUSE -dEmbedAllFonts=false -dSubsetFonts=true -dConvertCMYKImagesToRGB=true -dCompressFonts=true -sOutputFile=${OUT_DIRECTORY}/${MAIN_TEX_BASE_FILENAME}_reduce.pdf ${MAIN_PDF})
+
+FIND_PACKAGE(LATEX)
+IF(LATEX_FOUND)
+    IF(LATEX_XELATEX_FOUND)
+        MESSAGE(STATUS "xelatex found - ${XELATEX_COMPILER}")
+    ENDIF()
+    IF(LATEX_BIBER_FOUND)
+        MESSAGE(STATUS "biber found - ${BIBER_COMPILER}")
+    ENDIF()
+    IF(LATEX_DVIPDF_FOUND)
+        MESSAGE(STATUS "dvipdf found - ${DVIPDF_CONVERTER}")
+    ENDIF()
+ELSE()
+    MESSAGE(FATAL_ERROR "No latex tools found!")
+ENDIF()
+
+# Execute shell command to get the username
+execute_process(
+    COMMAND whoami
+    OUTPUT_VARIABLE USERNAME
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_subdirectory(main)

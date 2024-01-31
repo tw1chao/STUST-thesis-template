@@ -1,0 +1,51 @@
+
+# Directory where the source files are located.
+SET(WORKINGDIR "${CMAKE_SOURCE_DIR}/main")
+
+SET_PROPERTY(GLOBAL PROPERTY RULE_MESSAGES OFF)
+
+IF(LATEX_FOUND AND LATEX_DVIPDF_FOUND)
+
+    # First pass.
+    ADD_CUSTOM_TARGET(latex-prebuild
+        COMMAND ${XELATEX_COMPILER} ${TEX_OPTS} -draftmode ${MAIN_TEX}
+        COMMENT "Starting Prebuild."
+        WORKING_DIRECTORY ${WORKINGDIR}
+        DEPENDS ${MAIN_TEX})
+
+    # Generate the indices for the index table.
+    ADD_CUSTOM_TARGET( latex-build
+        COMMAND ${XELATEX_COMPILER} ${TEX_OPTS} ${MAIN_TEX}
+        COMMENT "Read and create indices with ${MAIN_IDX}"
+        WORKING_DIRECTORY ${WORKINGDIR}
+        DEPENDS ${MAIN_TEX})
+    ADD_DEPENDENCIES(latex-build latex-prebuild)
+
+    # Generate what citation found in the latex file.
+    ADD_CUSTOM_TARGET(latex-bibreferences
+        COMMAND ${BIBER_COMPILER} ${OUT_DIRECTORY}/${MAIN_TEX_BASE_FILENAME}
+        COMMENT "Read and create main bib references file."
+        DEPENDS ${MAIN_AUX})
+    ADD_DEPENDENCIES(latex-bibreferences latex-prebuild)
+
+    # Second pass - generate the final pdf.
+    ADD_CUSTOM_TARGET(latex-pdf
+        COMMAND ${XELATEX_COMPILER} -output-directory ${OUT_DIRECTORY} ${MAIN_TEX}
+        COMMENT "Assembling the final pdf file."
+        WORKING_DIRECTORY ${WORKINGDIR}
+        DEPENDS ${MAIN_TEX})
+    ADD_DEPENDENCIES(latex-pdf latex-prebuild latex-build latex-bibreferences )
+
+    # Entry point of execution.
+    ADD_CUSTOM_TARGET(all-formats ALL
+        DEPENDS latex-pdf)
+    # ADD_DEPENDENCIES(all-formats ${MAIN_XDV})
+    # message(WARNING "Nothing to be done for 'all', or remove ${MAIN_XDV}")
+
+    ADD_CUSTOM_TARGET(pdf-reduce
+        COMMAND ${GS_EXECUTABLE} ${GHOSTSCRIPT_LFLAGS}
+        DEPENDS ${MAIN_PDF}) 
+
+ELSE()
+    MESSAGE(FATAL_ERROR "No latex tools found!")
+ENDIF()

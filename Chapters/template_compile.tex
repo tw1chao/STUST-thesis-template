@@ -62,6 +62,177 @@ Git 與常用的版本控制工具 CVS, Subversion 等不同，它採用了分�
 
 \subsection{make}
 
+欲使用 makefile 編譯此模版，在專案目錄底下新增 makefile 及 main/ 目錄底下新增 makefile。
+
+\newpage
+
+此檔案為專案根目錄底下 makefile
+
+%[language=makefile]
+\begin{lstlisting} 
+    # file:  ./makefile
+    # Date:  2021/10/15
+    # Name:  YingChao
+    
+    
+    # 主要文件名稱 (不需加副檔名)
+    MAINDOC  = main
+    
+    # 是否使用預編譯
+    precompiled = 0
+    
+    # 編譯文件放置目錄檔案
+    BUILD_DIR = build
+    
+    # 設定目標及根目錄
+    OUTPDF = main
+    TARGET = ${BUILD_DIR}/${OUTPDF}.xdv
+    
+    # 讀取子目錄
+    SUBDIRS = $(shell ls -l | grep ^d | awk '{if($$9 == "$(MAINDOC)") print $$9}')
+    OUTDIRS = $(shell ls -l | grep ^d | awk '{if($$9 == "$(BUILD_DIR)") print $$9}')
+    
+    # 讀取 pdf 以外的輸出文件
+    OUTFILE=$(shell ls -l $(OUTDIRS) | grep ^- | awk '{if($$9 != "$(MAINDOC).pdf") print $$9}')
+    
+    # 記住當前根目錄路徑
+    ROOT_DIR=$(shell pwd)
+    
+    # commands to compile document
+    MAKE	    = +make
+    LATEX       = xelatex
+    MAKEPDF	    = xdvipdfmx
+    BIBTEX	    = biber
+    GHOSTSCRIPT = ghostscript
+    xDVI_PDFMx  = -E -o $(OUTPDF).pdf
+    
+    # commands parameter
+    FILESYNC = -synctex=1
+    FILE_ERR = -file-line-error
+    INTERACT = -interaction=nonstopmode  #batchmode
+    HALT_ERR = -halt-on-error
+    NONE_PDF = -no-pdf
+    OUTP_DIR = -output-directory=$(ROOT_DIR)/$(BUILD_DIR)
+    OUTP_DRV = -output-driver='xdvipdfmx -z0' # 此參數設定 PDF 壓縮等級
+    
+    ifeq ($(precompiled), 1)
+    PRECOMPL = -shell-escape "&$(LATEX)"
+    
+    TEX_Parameter = $(NONE_PDF) $(OUTP_DIR) $(OUTP_DRV) \
+                    $(HALT_ERR) $(PRECOMPL) 
+    else
+    TEX_Parameter = $(FILESYNC) $(FILE_ERR) $(INTERACT) \
+                    $(HALT_ERR) $(NONE_PDF) $(OUTP_DIR) \
+                    $(OUTP_DRV)
+    endif
+    
+    # 宣告以下為廣域變數，使子目錄的 makefile 也能讀取以下變數
+    export MAINDOC ROOT_DIR BUILD_DIR OUTP_DIR
+    export LATEX BIBTEX TEX_Parameter precompiled
+    export MAKE MAKEPDF xDVI_PDFMx OUTPDF
+    
+    NoPrintDir = --no-print-directory # make 不顯示進入/離開目錄訊息
+    
+    all: ${TARGET}
+    
+    ${TARGET}:
+        @echo "\033[33m make a directory \033[0m"
+        @mkdir -p $(BUILD_DIR)
+        @$(MAKE) -C $(SUBDIRS) $(NoPrintDir)
+    
+    clean:
+        @rm -rf $(OUTDIRS)
+    
+    staypdf:
+    ifeq ($(strip $(OUTFILE)),)
+        @echo "\033[1;31m [MSG] file already cleaned \033[0m"
+    else
+        @echo "\033[1;31m [MSG] start clean file\033[0m"
+        @cd $(OUTDIRS);\
+        rm $(OUTFILE)
+        @echo "\033[1;32m [MSG] Retain pdf , other file for deleting \033[0m"
+    endif
+    
+    
+    # https://www.internalpointers.com/post/compress-pdf-file-ghostscript-linux
+    # sudo apt install ghostscript
+    
+    # 		-sOwnerPassword=mypassword \
+    
+    compress:
+        $(GHOSTSCRIPT) -sDEVICE=pdfwrite \
+        -dCompatibilityLevel=1.4 \
+        -dPDFSETTINGS=/printer \
+        -dQUIET -dBATCH -dNOPAUSE	\
+        -dEmbedAllFonts=false \
+          -dSubsetFonts=true \
+          -dConvertCMYKImagesToRGB=true \
+          -dCompressFonts=true \
+        -sOutputFile=${BUILD_DIR}/$(MAINDOC)_out.pdf \
+        ${BUILD_DIR}/$(MAINDOC).pdf
+        @echo -e "\033[32m [MSG] 		PDF Size is compressed\033[0m"	
+        @cd $(BUILD_DIR);\
+        rm -f *.xdv;\
+        rm -f $(MAINDOC).pdf;\
+        mv $(MAINDOC)_out.pdf $(MAINDOC).pdf
+    
+    
+    .PHONY: clean all
+    
+ \end{lstlisting}
+
+ \newpage
+
+ 此檔案為 main 目錄底下 makefile
+
+%[language=makefile]
+ \begin{lstlisting}
+    # file: main/makefile
+    # Date:  2022/06/11
+    # Name:  YingChao
+    
+    # source files
+    TEX_FILES=${wildcard *.tex}
+    XDV_FILES = $(ROOT_DIR)/$(BUILD_DIR)/${MAINDOC}.xdv
+    
+    CURRENTDIR=$(shell pwd)
+    
+    
+    all:
+        @echo "\033[33m $(shell pwd) \033[0m"
+    ifeq ($(precompiled), 1)
+        @$(MAKE) xeINItex				# initialize
+        @echo "\033[32m [MSG] 		Initialized \033[0m"
+    endif
+        @$(MAKE) xetex					# 1st commpiling document
+        @echo "\033[32m [MSG] 		1st compiled \033[0m"
+        @$(MAKE) bibtex					# reference commpiling
+        @echo "\033[32m [MSG] 		Reference compiled  \033[0m"
+        @$(MAKE) xetex					# 2nd commpiling document
+        @echo "\033[32m [MSG] 		2nd compiled \033[0m"
+        @$(MAKE) xetex					# 3rd commpiling document 
+        @echo "\033[32m [MSG] 		3rd compiled \033[0m"
+        @$(MAKE) xDVIPDFMx				# Genrated PDF
+        @echo "\033[32m [MSG] 		Successly compiled  \033[0m"
+    
+    xetex:
+        $(LATEX) $(TEX_Parameter) $(TEX_FILES)
+    
+    bibtex:
+        $(BIBTEX) $(ROOT_DIR)/$(BUILD_DIR)/$(MAINDOC)
+    
+    xDVIPDFMx:
+        @cd $(ROOT_DIR)/$(BUILD_DIR);\
+        $(MAKEPDF) -vv $(xDVI_PDFMx) $(XDV_FILES)
+    
+    xeINItex:
+        $(LATEX) $(OUTP_DIR) -initialize -jobname="$(MAINDOC)" "&$(LATEX)" mylatexformat.ltx """$(MAINDOC).tex""" 
+    
+    # https://ctan.math.utah.edu/ctan/tex-archive/macros/latex/contrib/mylatexformat/mylatexformat.pdf
+    
+ \end{lstlisting}
+ 
+
 透過 make 命令執行論文 PDF 的編譯，或是透過 \ref*{latex_workshop} 套件的功能編譯本論文模版。
 
 \begin{description}
@@ -70,3 +241,18 @@ Git 與常用的版本控制工具 CVS, Subversion 等不同，它採用了分�
     \item[make staypdf] 清除 build 目錄底下 PDF 以外的檔案。
 \end{description}
 
+\subsection{cmake}
+
+動作順序為
+
+\begin{description}
+    \item[mkdir build] 建立 build 目錄
+    \item[cd build]  進入 build 目錄
+    \item[cmake ..]  cmake 建立編譯專案生成 makefile
+    \item[make]      make 命令編譯論文專案
+\end{description}
+
+
+也可以是 \newline
+cmake -S . -B build \newline
+cmake --build build \newline

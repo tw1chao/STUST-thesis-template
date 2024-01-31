@@ -1,3 +1,7 @@
+![Container - Docker](https://img.shields.io/badge/Docker-white?logo=Docker&logoColor=blue)
+![Container - Podman](https://img.shields.io/badge/Podman-white?logo=Podman&logoColor=purple)
+
+
 # Container
 
 您可以參考 [docker](https://www.docker.com/) 或 [podman](https://podman.io/).
@@ -55,26 +59,8 @@ $ sh unix/stop.sh
 
 ### 適用於 Windows **未驗證** (cmd / PowerShell)
 
----
-<div class="danger" style="
-  padding:0.1em; 
-  background-color: rgba(255, 99, 99, 0.2); /* Semi-transparent red background */
-  color: #cd0000; /* Readable red text color */
-  border-left: 0.5em solid #a50000; /* Dark red border on the left */
-  border-radius: 10px; /* Rounded corners for all sides */
-">
-  <span>
-    <p style="margin-top:1em; text-align:center; font-size:1.5em;">
-      <b>警告</b>
-    </p>
-    <p style="text-align:center;">
-      Windows 腳本尚未測試，請謹慎使用。
-    </p>
-  </span>
-</div>
-
----
-</br>
+> [!WARNING]
+> Windows 腳本尚未測試，請謹慎使用。
 
 * 編譯 Docker 映像並定制用戶開發環境參數。基礎源自 [ubuntu](https://hub.docker.com/r/_/ubuntu)。可以用鼠標雙擊 build.bat 或使用 cmd / powershell 執行。
 ```powershell
